@@ -2150,8 +2150,8 @@ evaluate_reference_mode(reference_mode_t* ref_mode)
 
 		ref_mode->enable_accumulation = qtrue;
 		ref_mode->enable_denoiser = qfalse;
-		ref_mode->num_bounce_rays = 2;
-		ref_mode->temporal_blend_factor = 1.f / min(max(1, num_accumulated_frames - num_warmup_frames), num_frames_to_accumulate);
+		ref_mode->num_bounce_rays = 5;
+		ref_mode->temporal_blend_factor = 1.0f / min(max(1, num_accumulated_frames - num_warmup_frames), num_frames_to_accumulate);
 		ref_mode->reflect_refract = max(4, cvar_pt_reflect_refract->integer);
 
 		switch (cvar_pt_accumulation_rendering->integer)
@@ -2159,7 +2159,7 @@ evaluate_reference_mode(reference_mode_t* ref_mode)
 		case 1: {
 			char text[MAX_QPATH];
 			float percentage = powf(max(0.f, (num_accumulated_frames - num_warmup_frames) / (float)num_frames_to_accumulate), 0.5f);
-			Q_snprintf(text, sizeof(text), "Photo mode: accumulating samples... %d%%", (int)(min(1.f, percentage) * 100.f));
+			Q_snprintf(text, sizeof(text), "Reference path tracing mode: accumulating samples... %d%% (%i)", (int)(min(1.f, percentage) * 100.f), num_accumulated_frames);
 
 			int frames_after_accumulation_finished = num_accumulated_frames - num_warmup_frames - num_frames_to_accumulate;
 			float hud_alpha = max(0.f, min(1.f, (50 - frames_after_accumulation_finished) * 0.02f)); // fade out for 50 frames after accumulation finishes
