@@ -2150,7 +2150,7 @@ evaluate_reference_mode(reference_mode_t* ref_mode)
 
 		ref_mode->enable_accumulation = qtrue;
 		ref_mode->enable_denoiser = qfalse;
-		ref_mode->num_bounce_rays = 5;
+		ref_mode->num_bounce_rays = 2;
 		ref_mode->temporal_blend_factor = 1.0f / min(max(1, num_accumulated_frames - num_warmup_frames), num_frames_to_accumulate);
 		ref_mode->reflect_refract = max(4, cvar_pt_reflect_refract->integer);
 
