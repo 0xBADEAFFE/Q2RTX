@@ -3467,6 +3467,7 @@ void CL_Init(void)
 
     HTTP_Init();
 
+	SV_InitGame(0);
     UI_OpenMenu(UIMENU_DEFAULT);
 
     Con_PostInit();
