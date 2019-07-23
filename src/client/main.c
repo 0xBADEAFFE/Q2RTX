@@ -104,6 +104,9 @@ extern cvar_t *gl_brightness;
 
 extern cvar_t *fs_shareware;
 
+extern cvar_t *cl_renderdemo;
+extern cvar_t *cl_renderdemo_fps;
+
 client_static_t cls;
 client_state_t  cl;
 
@@ -339,6 +342,7 @@ qboolean CL_ForwardToServer(void)
     }
 
     CL_ClientCommand(Cmd_RawArgsFrom(0));
+
     return qtrue;
 }
 
@@ -369,7 +373,7 @@ static void CL_ForwardToServer_f(void)
 CL_Pause_f
 ==================
 */
-static void CL_Pause_f(void)
+void CL_Pause_f(void)
 {
 #if USE_MVD_CLIENT
     if (sv_running->integer == ss_broadcast) {
@@ -2856,7 +2860,7 @@ static const cmdreg_t c_client[] = {
     { "drop" }, { "info" }, { "prog" },
     { "give" }, { "god" }, { "notarget" }, { "noclip" },
     { "invuse" }, { "invprev" }, { "invnext" }, { "invdrop" },
-    { "weapnext" }, { "weapprev" },
+	{ "weapnext" }, { "weapprev" },
 
     { NULL }
 };
@@ -3302,6 +3306,7 @@ CL_UpdateFrameTimes
 Called whenever async/fps cvars change, but not every frame
 ==================
 */
+extern cvar_t *cl_renderdemo;
 void CL_UpdateFrameTimes(void)
 {
     if (!cls.state) {
@@ -3323,7 +3328,8 @@ void CL_UpdateFrameTimes(void)
 		ref_msec = phys_msec = 0;
 		main_msec = fps_to_msec(10);
 		sync_mode = SYNC_SLEEP_10;
-	}else if (r_forcelowpower->integer == 1) {
+	}
+	else if (r_forcelowpower->integer == 1) {
 		ref_msec = fps_to_msec(10);
 		sync_mode = ASYNC_MAXFPS;
     } else if (cls.active == ACT_RESTORED || cls.state != ca_active) {
@@ -3362,6 +3368,12 @@ void CL_UpdateFrameTimes(void)
         }
     }
 
+	if (cl_renderdemo->integer && cls.demo.playback)
+	{
+		main_msec = fps_to_msec(cl_renderdemo_fps->integer);
+		sync_mode = SYNC_FULL;
+	}
+
     Com_DDDPrintf("%s: mode=%s main_msec=%d ref_msec=%d, phys_msec=%d\n",
                   __func__, sync_names[sync_mode], main_msec, ref_msec, phys_msec);
 
@@ -3374,9 +3386,11 @@ CL_Frame
 
 ==================
 */
+unsigned int totaltime = 0;
+unsigned int lasttime = 0;
 unsigned CL_Frame(unsigned msec)
 {
-    qboolean phys_frame, ref_frame;
+	qboolean phys_frame, ref_frame;
 
     time_after_ref = time_before_ref = 0;
 
@@ -3390,6 +3404,7 @@ unsigned CL_Frame(unsigned msec)
     CL_ProcessEvents();
 
     ref_frame = phys_frame = qtrue;
+
     switch (sync_mode) {
     case SYNC_FULL:
         // timedemo just runs at full speed
@@ -3442,6 +3457,9 @@ unsigned CL_Frame(unsigned msec)
         break;
     }
 
+	if (cls.demo.playback && cl_renderdemo->integer && cl_paused->integer != 2)
+		main_extra = main_msec;
+
     Com_DDDDPrintf("main_extra=%d ref_frame=%d ref_extra=%d "
                    "phys_frame=%d phys_extra=%d\n",
                    main_extra, ref_frame, ref_extra,
@@ -3453,7 +3471,7 @@ unsigned CL_Frame(unsigned msec)
     if (cls.frametime > 1.0 / 5)
         cls.frametime = 1.0 / 5;
 
-    if (!sv_paused->integer) {
+    if (!sv_paused->integer && !(cls.demo.playback && cl_renderdemo->integer && cl_paused->integer == 2)) {
         cl.time += main_extra;
 #if USE_FPS
         cl.keytime += main_extra;
@@ -3465,7 +3483,7 @@ unsigned CL_Frame(unsigned msec)
         CL_DemoFrame(main_extra);
 
     // calculate local time
-    if (cls.state == ca_active && !sv_paused->integer)
+    if (cls.state == ca_active && !sv_paused->integer && !(cls.demo.playback && cl_renderdemo->integer && cl_paused->integer == 2))
         CL_SetClientTime();
 
 #if USE_AUTOREPLY
@@ -3492,6 +3510,13 @@ unsigned CL_Frame(unsigned msec)
             phys_extra = 0;
         }
     }
+
+	if (cls.demo.playback && cl_renderdemo->integer && cl_paused->integer != 2)
+	{
+		Cvar_Set("cl_paused", "2");
+		CL_CheckForPause();
+	}
+
 
     // send pending cmds
     CL_SendCmd();
@@ -3546,6 +3571,7 @@ run_fx:
     cls.framecount++;
 
     main_extra = 0;
+
     return 0;
 }
 
@@ -3658,6 +3684,8 @@ void CL_Init(void)
 	}
 
 	CheckUpdate();
+
+	
 }
 
 /*
