@@ -2705,30 +2705,27 @@ size_t writefunc(void *ptr, size_t size, size_t nmemb, struct string *s)
 	return size * nmemb;
 }
 
-void ForkAuthor(void)
+void GetUpdate(void)
 {
-	if (WIN32)
-		system("start https://www.skacikpl.pl");
-	else
-		system("xdg-open https://www.skacikpl.pl");
-}
-
-void UpdateFork(void)
-{
+    // TODO: Add Url
+/*
 	if (updateavailable == qtrue)
 	{
 		if (WIN32)
-			system("start https://github.com/SkacikPL/Q2RTX/releases");
+			system("start URL/Q2RTX/releases");
 		else
-			system("xdg-open https://github.com/SkacikPL/Q2RTX/releases");
+			system("xdg-open URL/Q2RTX/releases");
 	}
 	else
 		Com_Printf("There is no need to update!\n");
+*/
 }
 
 void GetMOTD(void)
 {
-	CURL *curl;
+    // TODO: Add Url
+/*
+    CURL *curl;
 	CURLcode res;
 
 	curl = curl_easy_init();
@@ -2736,7 +2733,7 @@ void GetMOTD(void)
 		struct string s;
 		init_string(&s);
 
-		curl_easy_setopt(curl, CURLOPT_URL, "http://www.skacikpl.pl/q2rtxmotd.txt");
+		curl_easy_setopt(curl, CURLOPT_URL, "URL/q2rtxmotd.txt");
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 		curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
@@ -2765,10 +2762,13 @@ void GetMOTD(void)
 		curl_easy_cleanup(curl);
 		Com_Printf("You can disable MOTD by typing 'showmotd 0' in console.\n");
 	}
+*/
 }
 
 void CheckUpdate(void)
 {
+    // TODO: Add Url
+/*
 	CURL *curl;
 	CURLcode res;
 
@@ -2777,7 +2777,7 @@ void CheckUpdate(void)
 		struct string s;
 		init_string(&s);
 
-		curl_easy_setopt(curl, CURLOPT_URL, "http://www.skacikpl.pl/q2rtxverinfo.txt");
+		curl_easy_setopt(curl, CURLOPT_URL, "URL/q2rtxverinfo.txt");
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 		curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
@@ -2812,12 +2812,12 @@ void CheckUpdate(void)
 		free(s.ptr);
 		curl_easy_cleanup(curl);
 	}
+*/
 }
 
 static const cmdreg_t c_client[] = {
 	{ "motd", GetMOTD},
-	{ "skacikpl", ForkAuthor},
-	{ "update", UpdateFork},
+	{ "update", GetUpdate},
 	{ "checkupdate", CheckUpdate},
     { "cmd", CL_ForwardToServer_f },
     { "pause", CL_Pause_f },
@@ -3663,7 +3663,7 @@ void CL_Init(void)
 	Com_LPrintf(PRINT_NOTICE, "  .--.      .-'.      .--.      .--.      .--.      .--.      .`-.      .--.\n");
 	Com_LPrintf(PRINT_NOTICE, ":::::.\\::::::::.\\::::::::.\\::::::::.\\::::::::.\\::::::::.\\::::::::.\\::::::::.\\ \n");
 	Com_LPrintf(PRINT_NOTICE, "'      `--'      `.-'      `--'      `--'      `--'      `-.'      `--'      `\n");
-	Com_LPrintf(PRINT_NOTICE, "Quake II RTX\nCustom build by SkacikPL\nhttps://www.skacikpl.pl\nType skacikpl in console to visit.\n");
+	Com_LPrintf(PRINT_NOTICE, "Quake II RTX\nCustom build\n");
 	Com_LPrintf(PRINT_NOTICE, "  .--.      .-'.      .--.      .--.      .--.      .--.      .`-.      .--.\n");
 	Com_LPrintf(PRINT_NOTICE, ":::::.\\::::::::.\\::::::::.\\::::::::.\\::::::::.\\::::::::.\\::::::::.\\::::::::.\\ \n");
 	Com_LPrintf(PRINT_NOTICE, "'      `--'      `.-'      `--'      `--'      `--'      `-.'      `--'      `\n");
@@ -3671,8 +3671,9 @@ void CL_Init(void)
 
 	if (firstrun->integer)
 	{
-		Com_WPrintf("PLEASE READ:\n");
-		Com_WPrintf("This build estabilishes a connection to a remote server located at https://www.skacikpl.pl to fetch most recent version info.\n");
+		// Com_WPrintf("PLEASE READ:\n");
+        // TODO: Add Url
+		// Com_WPrintf("This build estabilishes a connection to a remote server located at URL to fetch most recent version info.\n");
 		Com_WPrintf("This is one time message displayed on first boot.\n");
 		Cvar_Set("firstrun", "0");
 	}
@@ -3684,8 +3685,6 @@ void CL_Init(void)
 	}
 
 	CheckUpdate();
-
-	
 }
 
 /*
