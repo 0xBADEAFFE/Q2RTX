@@ -64,6 +64,7 @@ cvar_t *gib_on;
 
 cvar_t  *sv_features;
 cvar_t  *sv_flaregun;
+cvar_t	*cl_monsterfootsteps;
 
 void SpawnEntities(char *mapname, char *entities, char *spawnpoint);
 void ClientThink(edict_t *ent, usercmd_t *cmd);
