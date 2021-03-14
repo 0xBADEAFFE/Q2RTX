@@ -2301,9 +2301,8 @@ evaluate_reference_mode(reference_mode_t* ref_mode)
 					}
 					else
 						CL_Disconnect(ERR_DISCONNECT);
-					}
-					break;
 				}
+				break;
 			}
 		}
 		case 2:
